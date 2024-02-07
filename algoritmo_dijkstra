@@ -1,0 +1,64 @@
+import heapq
+
+class Grafo:
+    def __init__(self):
+        self.vertices = set()
+        self.arestas = {}
+        self.distancias = {}
+
+    def adicionar_vertice(self, valor):
+        self.vertices.add(valor)
+        self.arestas[valor] = []
+
+    def adicionar_aresta(self, de, para, distancia):
+        self.arestas[de].append((para, distancia))
+        self.arestas[para].append((de, distancia))
+
+    def dijkstra(self, inicio):
+        fila = [(0, inicio)]
+        heapq.heapify(fila)
+
+        while fila:
+            (distancia, atual) = heapq.heappop(fila)
+
+            if atual not in self.distancias:
+                self.distancias[atual] = distancia
+
+                for vizinho, peso in self.arestas[atual]:
+                    nova_distancia = distancia + peso
+                    heapq.heappush(fila, (nova_distancia, vizinho))
+
+    def caminho_mais_curto(self, inicio, fim):
+        if not self.distancias:
+            self.dijkstra(inicio)
+
+        caminho = [fim]
+        atual = fim
+
+        while atual != inicio:
+            atual = min((vizinho for vizinho, peso in self.arestas[atual]),
+                        key=lambda x: self.distancias[x])
+            caminho.insert(0, atual)
+
+        return caminho
+
+grafo = Grafo()
+
+grafo.adicionar_vertice('A')
+grafo.adicionar_vertice('B')
+grafo.adicionar_vertice('C')
+grafo.adicionar_vertice('D')
+grafo.adicionar_vertice('E')
+
+grafo.adicionar_aresta('A', 'B', 2)
+grafo.adicionar_aresta('A', 'C', 4)
+grafo.adicionar_aresta('B', 'C', 1)
+grafo.adicionar_aresta('B', 'D', 7)
+grafo.adicionar_aresta('C', 'E', 3)
+grafo.adicionar_aresta('D', 'E', 1)
+
+inicio = 'A'
+fim = 'E'
+
+caminho = grafo.caminho_mais_curto(inicio, fim)
+print(f'Caminho mais curto: {inicio} para {fim}: {caminho}')
